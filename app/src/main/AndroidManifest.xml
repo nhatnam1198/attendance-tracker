@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.facerecogapp">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.FaceRecogApp"
+        android:usesCleartextTraffic="true">
+        <activity android:name=".Activity.StatisticsActivity"></activity>
+        <activity
+            android:name=".Activity.AbsenceRequestApprovalActivity"
+            android:label="@string/title_activity_absence_request_approval"
+            android:theme="@style/Theme.FaceRecogApp.NoActionBar">
+            >
+        </activity>
+        <activity
+            android:name=".Activity.LeaveOfAbsenceActivity"
+            android:label="@string/title_activity_leave_of_absent"
+            android:theme="@style/Theme.FaceRecogApp.NoActionBar" />
+        <activity
+            android:name=".Activity.AttendedResultActivity"
+            android:label="@string/title_activity_checked_event"
+            android:theme="@style/Theme.FaceRecogApp.NoActionBar" />
+        <activity
+            android:name=".Activity.SuccessActivity"
+            android:label="@string/title_activity_result"
+            android:theme="@style/Theme.FaceRecogApp.NoActionBar" />
+        <activity
+            android:name=".Activity.AbsentStudentList"
+            android:label="@string/title_activity_absent_student_list"
+            android:theme="@style/Theme.FaceRecogApp.NoActionBar" />
+        <activity
+            android:name=".Activity.AttendedStudent"
+            android:label="@string/title_activity_attended_student"
+            android:theme="@style/Theme.FaceRecogApp.NoActionBar" />
+        <activity
+            android:name=".Activity.AttendanceActivity"
+            android:label="AttendanceActivity"
+            android:theme="@style/Theme.FaceRecogApp.NoActionBar" />
+        <activity
+            android:name=".StudentList"
+            android:label="@string/title_activity_student_list"
+            android:theme="@style/Theme.FaceRecogApp.NoActionBar" />
+        <activity
+            android:name=".Activity.MainActivity"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.FaceRecogApp.NoActionBar"
+            android:windowSoftInputMode="adjustNothing">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission
+        android:name="android.permission.CAMERA"
+        android:required="true" />
+
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+</manifest>

@@ -1,0 +1,51 @@
+<resources>
+    <string name="app_name">FaceRecogApp</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+    <string name="subject">Môn</string>
+    <string name="add_schedule">Thêm lịch giảng dạy</string>
+    <string name="classroom">Lớp</string>
+    <string name="shift">Ca:</string>
+    <string name="className">Lớp:</string>
+    <string name="menu_home">Home</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_slideshow">Slideshow</string>
+    <string name="cancel">Hủy</string>
+    <string name="Ok">Ok</string>
+    <string name="title_activity_main">MainActivity</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="title_activity_student_list">StudentList</string>
+    <string name="faceBtn">Điểm danh khuôn mặt</string>
+    <string name="regularCheckBtn">Điểm danh</string>
+    <string name="GET_SHIFT_LIST_ERROR">GET_SHIFT_LIST_ERROR</string>
+    <string name="title_activity_attendance">attendance</string>
+    <string name="title_activity_attended_student">AttendedStudent</string>
+    <string name="absentStudentList">Danh sách học sinh vắng</string>
+    <string name="title_activity_absent_student_list">AbsentStudentList</string>
+    <string name="submit">Hoàn thành</string>
+    <string name="title_activity_result">Result</string>
+    <string name="home">Màn hình chính</string>
+    <string name="HTTP500">Kết nối tới server thất bại</string>
+    <string name="GET_SUBJECT_CLASS_ERROR">GET_SUBJECT_CLASS_ERROR</string>
+    <string name="ADD_EVENT_ERROR">ADD_EVENT_ERROR</string>
+    <string name="eventName">Tên sự kiện</string>
+    <string name="CONNECTION_FAILURE">Kết nối thất bại</string>
+    <string name="no_data_available">Không có dữ liệu</string>
+    <string name="empty_list">Không có dữ liệu</string>
+    <string name="title_activity_checked_event">CheckedEvent</string>
+    <string name="CONFIRM">Xác nhận</string>
+    <string name="title_activity_leave_of_absent">LeaveOfAbsentActivity</string>
+    <string name="title_activity_absence_request_approval">AbsenceRequestApprovalActivity</string>
+    <string name="menu_statistics">Thống kê</string>
+</resources>

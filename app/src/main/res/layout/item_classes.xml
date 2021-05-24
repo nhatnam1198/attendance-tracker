@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/constraintLayout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/layout_bg"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_margin="5dp"
+    android:layout_marginBottom="4dp"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/item_label_1"
+        android:layout_width="91dp"
+        android:layout_height="25dp"
+
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="4dp"
+        android:text="@string/eventName"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/item_label_2"
+        android:layout_width="90dp"
+        android:layout_height="25dp"
+        android:layout_marginTop="4dp"
+        android:text="@string/className"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/item_label_3"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/item_label_3"
+        app:layout_constraintTop_toBottomOf="@+id/item_label_3" />
+
+    <TextView
+        android:id="@+id/item_label_3"
+        android:layout_width="92dp"
+        android:layout_height="25dp"
+        android:layout_marginTop="4dp"
+        android:text="@string/subject"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/item_label_1"
+        app:layout_constraintStart_toStartOf="@+id/item_label_1"
+        app:layout_constraintTop_toBottomOf="@+id/item_label_1" />
+
+    <TextView
+        android:id="@+id/item_event_name"
+        android:layout_width="150dp"
+        android:layout_height="25dp"
+        android:layout_marginStart="12dp"
+
+
+        android:textColor="@color/white"
+        app:layout_constraintStart_toEndOf="@+id/item_label_1"
+        app:layout_constraintTop_toTopOf="@+id/item_label_1" />
+
+    <TextView
+        android:id="@+id/item_subject"
+        android:layout_width="150dp"
+        android:layout_height="25dp"
+
+        android:layout_marginTop="4dp"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="@+id/item_event_name"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/item_event_name"
+        app:layout_constraintTop_toBottomOf="@+id/item_event_name" />
+
+    <TextView
+        android:id="@+id/item_class"
+        android:layout_width="150dp"
+        android:layout_height="25dp"
+
+        android:layout_marginTop="4dp"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="@+id/item_subject"
+        app:layout_constraintHorizontal_bias="0.4"
+        app:layout_constraintStart_toStartOf="@+id/item_subject"
+        app:layout_constraintTop_toBottomOf="@+id/item_subject" />
+
+    <TextView
+        android:id="@+id/item_classes_label_4"
+        android:layout_width="90dp"
+        android:layout_height="25dp"
+        android:layout_marginTop="4dp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:text="Ca"
+        app:layout_constraintEnd_toEndOf="@+id/item_label_2"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/item_label_2"
+        app:layout_constraintTop_toBottomOf="@+id/item_label_2" />
+
+    <TextView
+        android:id="@+id/item_shift"
+        android:layout_width="150dp"
+        android:layout_height="25dp"
+        android:textColor="@color/white"
+        android:layout_marginTop="4dp"
+        app:layout_constraintEnd_toEndOf="@+id/item_class"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/item_class"
+        app:layout_constraintTop_toBottomOf="@+id/item_class" />
+</androidx.constraintlayout.widget.ConstraintLayout>
