@@ -14,6 +14,15 @@ public class Event implements Serializable {
 
     private Date dateTime;
     private int status;
+    private List<AttendanceDetail> attendanceDetailsList = new ArrayList<>();
+
+    public List<AttendanceDetail> getAttendanceDetailsList() {
+        return attendanceDetailsList;
+    }
+
+    public void setAttendanceDetailsList(List<AttendanceDetail> attendanceDetailsList) {
+        this.attendanceDetailsList = attendanceDetailsList;
+    }
 
     public Integer getId() {
         return id;

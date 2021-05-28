@@ -2,7 +2,6 @@ package com.example.facerecogapp.ui.statistics;
 
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.graphics.Color;
@@ -17,28 +16,16 @@ import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.SeekBar;
-import android.widget.Toast;
 
-import com.example.facerecogapp.API.EventAPI;
-import com.example.facerecogapp.API.SubjectClassAPI;
-import com.example.facerecogapp.CallBack.ResultCallBack;
-import com.example.facerecogapp.CallBack.SubjectClassCallBack;
-import com.example.facerecogapp.Model.Event;
-import com.example.facerecogapp.Model.SubjectClass;
 import com.example.facerecogapp.Other.DayAxisValueFormatter;
 import com.example.facerecogapp.Other.Fill;
 import com.example.facerecogapp.Other.MyAxisValueFormatter;
 import com.example.facerecogapp.Other.XYMarkerView;
 import com.example.facerecogapp.R;
-import com.example.facerecogapp.Service.ServiceGenerator;
 import com.example.facerecogapp.ui.home.HomeViewModel;
 import com.example.facerecogapp.ui.statisticsChart.StatisticsChartFragment;
 import com.github.mikephil.charting.animation.Easing;
@@ -63,24 +50,14 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.mikephil.charting.utils.MPPointF;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 public class StatisticsFragment extends Fragment implements SeekBar.OnSeekBarChangeListener, OnChartValueSelectedListener {
-
 
     private StatisticsViewModel mViewModel;
     private PieChart pieChart;
     private BarChart barChart;
-    private Integer subjetClassId;
-    ArrayList<SubjectClass> subjectClasses = new ArrayList<>();
-    ArrayList<Event> eventList = new ArrayList<>();
-    private AutoCompleteTextView subjectClassAutoCompleteTextView;
 
     public static StatisticsFragment newInstance() {
         return new StatisticsFragment();
@@ -96,51 +73,6 @@ public class StatisticsFragment extends Fragment implements SeekBar.OnSeekBarCha
 //        barChart = root.findViewById(R.id.bar_chart);
 //        initBarChart();
 //        initPieChart();
-        subjectClassAutoCompleteTextView = root.findViewById(R.id._statistics_fragment_subject_class_autocomplete);
-        getSubjectClassByTeacherId(new SubjectClassCallBack() {
-            @Override
-            public void onSuccess(ArrayList<SubjectClass> value) {
-                subjectClasses = value;
-                if(subjectClasses.size() == 0){
-                    Toast.makeText(getContext(), "Không có lớp học phần cho môn học này", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                ArrayList<String> subjectClassNames = new ArrayList<>();
-                for(int i = 0; i< subjectClasses.size(); i++){
-                    subjectClassNames.add(subjectClasses.get(i).getName());
-                }
-                ArrayAdapter subjectClassArrayAdapter = new ArrayAdapter(getContext(), R.layout.list_item, subjectClassNames);
-                subjectClassAutoCompleteTextView.setText("Chọn lớp học phần", false);
-                subjectClassAutoCompleteTextView.setAdapter(subjectClassArrayAdapter);
-                subjectClassAutoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        subjetClassId = subjectClasses.get(position).getId();
-                        getEventListBySubjectClassId(new ResultCallBack<Event>() {
-                            @Override
-                            public void onSuccess(ArrayList<Event> value) {
-                                eventList = value;
-                                StatisticsChartFragment statisticsChartFragment = (StatisticsChartFragment)getChildFragmentManager().findFragmentById(R.id.child_fragment_container);
-                                statisticsChartFragment.getEventList(eventList);
-                                StatisticsViewModel model =  new ViewModelProvider(getActivity()).get(StatisticsViewModel.class);
-                                model.setEventArrayList(eventList);
-                            }
-                            @Override
-                            public void onFailure(Throwable t) {
-
-                            }
-                        }, subjetClassId);
-
-                    }
-                });
-            }
-            @Override
-            public void onFailure() {
-
-            }
-        }, 73);
-
-
         return root;
     }
     @Override
@@ -261,58 +193,7 @@ public class StatisticsFragment extends Fragment implements SeekBar.OnSeekBarCha
         barChart.setMarker(mv); // Set the marker to the chart
         setBarChartData(3, 3);
     }
-    public void getEventListBySubjectClassId(ResultCallBack<Event> eventResultCallBack, Integer subjetClassId){
-        try{
-            EventAPI eventAPI = ServiceGenerator.createService(EventAPI.class);
-            Call<ArrayList<Event>> call = eventAPI.getEventListBySubjectClassId(subjetClassId);
-            call.enqueue(new Callback<ArrayList<Event>>() {
-                @Override
-                public void onResponse(Call<ArrayList<Event>> call, Response<ArrayList<Event>> response) {
-                    if(!response.isSuccessful()){
-                        try {
-                            Log.d(getString(R.string.GET_SUBJECT_CLASS_ERROR), response.errorBody().string());
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        return;
-                    }
-                    eventResultCallBack.onSuccess(response.body());
-                }
-                @Override
-                public void onFailure(Call<ArrayList<Event>> call, Throwable t) {
-                    Toast.makeText(getContext(), R.string.HTTP500, Toast.LENGTH_SHORT).show();
-                }
-            });
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-    public void getSubjectClassByTeacherId(SubjectClassCallBack subjectCallBack, Integer teacherId){
-        try{
-            SubjectClassAPI subjectClassAPI = ServiceGenerator.createService(SubjectClassAPI.class);
-            Call<ArrayList<SubjectClass>> call = subjectClassAPI.getSubjectClassByTeacherId(teacherId);
-            call.enqueue(new Callback<ArrayList<SubjectClass>>() {
-                @Override
-                public void onResponse(Call<ArrayList<SubjectClass>> call, Response<ArrayList<SubjectClass>> response) {
-                    if(!response.isSuccessful()){
-                        try {
-                            Log.d(getString(R.string.GET_SUBJECT_CLASS_ERROR), response.errorBody().string());
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        return;
-                    }
-                    subjectCallBack.onSuccess(response.body());
-                }
-                @Override
-                public void onFailure(Call<ArrayList<SubjectClass>> call, Throwable t) {
-                    Toast.makeText(getContext(), R.string.HTTP500, Toast.LENGTH_SHORT).show();
-                }
-            });
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
+
     private void setPieChartData(int count, float range) {
         ArrayList<PieEntry> entries = new ArrayList<>();
 

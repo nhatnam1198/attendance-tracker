@@ -12,7 +12,7 @@ public class ServiceGenerator {
     private static final String BASE_URL = "http://192.168.1.93:8080/api/";
     private static  final Gson gson = new GsonBuilder()
                     .setLenient()
-                    .setDateFormat("MM-dd-yyyy")
+                    .setDateFormat("yyyy-MM-dd")
                     .create();
     private static Retrofit.Builder builder =
             new Retrofit.Builder()

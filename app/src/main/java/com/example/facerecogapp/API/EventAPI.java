@@ -14,6 +14,7 @@ import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface EventAPI {
     @POST("event")
@@ -22,4 +23,7 @@ public interface EventAPI {
 
     @GET("event/{date}")
     Call<ArrayList<Event>> getEventByDate(@Path("date") String eventDate);
+
+    @GET("event/")
+    Call<ArrayList<Event>> getEventListBySubjectClassId(@Query("subjectClassId") Integer subjetClassId);
 }

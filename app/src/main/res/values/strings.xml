@@ -48,4 +48,5 @@
     <string name="title_activity_leave_of_absent">LeaveOfAbsentActivity</string>
     <string name="title_activity_absence_request_approval">AbsenceRequestApprovalActivity</string>
     <string name="menu_statistics">Thống kê</string>
+    <string name="subject_class">Lớp học phần</string>
 </resources>

@@ -13,4 +13,7 @@ import retrofit2.http.Query;
 public interface SubjectClassAPI {
     @GET("subjectClass/list")
     Call<ArrayList<SubjectClass>> getSubjectClassListBySubjectIdAndTeacherId(@Query("subjectId") Integer subjectId, @Query("teacherId") Integer teacherId);
+
+    @GET("subjectClass/teacher/list")
+    Call<ArrayList<SubjectClass>> getSubjectClassByTeacherId(@Query("teacherId") Integer teacherId);
 }
