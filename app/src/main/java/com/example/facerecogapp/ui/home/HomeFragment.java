@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -64,17 +65,57 @@ public class HomeFragment extends Fragment {
     private List<Subject> subjectList;
     private CalendarView calendarView;
     private RecyclerView recyclerViewClasses;
-
+    private FloatingActionButton addScheduleBtn;
+    private TextView addScheduleBtnText;
+    private FloatingActionButton fabButton;
+    private boolean isFabsVisible = false;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         homeViewModel =
                 new ViewModelProvider(this).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
-
+        setHasOptionsMenu(true);
         recyclerViewClasses = (RecyclerView) root.findViewById(R.id.home_fragment_recycle_view);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerViewClasses.setLayoutManager(layoutManager);
+        addScheduleBtn = (FloatingActionButton)root.findViewById(R.id.add_schedule_btn);
+        addScheduleBtnText = root.findViewById(R.id.add_schedule_btn_text);
+        addScheduleBtn.setVisibility(View.GONE);
+        addScheduleBtnText.setVisibility(View.GONE);
+        addScheduleBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fragmentManager = getFragmentManager();
+                AddScheduleDialog fragment = new AddScheduleDialog();
+                Bundle bundle = new Bundle();
+                if(shiftList != null){
+                    bundle.putSerializable("shiftList", (ArrayList<Shift>) shiftList);
+                    bundle.putSerializable("subjectList", (ArrayList<Subject>) subjectList);
+                    fragment.setArguments(bundle);
+                    fragment.show(fragmentManager, "dialog");
 
+                }
+            }
+        });
+        fabButton = (FloatingActionButton)root.findViewById(R.id.fab);
+        isFabsVisible = false;
+        fabButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!isFabsVisible){
+                    fabButton.show();
+                    addScheduleBtn.show();
+                    addScheduleBtn.setVisibility(View.VISIBLE);
+                    addScheduleBtnText.setVisibility(View.VISIBLE);
+                    isFabsVisible = true;
+                }else{
+                    addScheduleBtn.hide();
+                    addScheduleBtn.setVisibility(View.GONE);
+                    addScheduleBtnText.setVisibility(View.GONE);
+                    isFabsVisible = false;
+                }
+            }
+        });
 
         fetchShiftList(new ShiftCallBack() {
             @Override
@@ -114,7 +155,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
                 month = month + 1;
-                String newDate = year+"-"+month + "-" + dayOfMonth;
+                String newDate = year+"-"+ month + "-" + dayOfMonth;
 
                 getEventByDate(new ResultCallBack<Event>() {
                     @Override
@@ -122,8 +163,6 @@ public class HomeFragment extends Fragment {
                         EventAdapter eventAdapter = new EventAdapter(eventArrayList, getContext());
                         recyclerViewClasses.setAdapter(eventAdapter);
                         recyclerViewClasses.setLayoutManager(new LinearLayoutManager(getContext()));
-
-
                     }
 
                     @Override
@@ -136,6 +175,11 @@ public class HomeFragment extends Fragment {
         });
         return root;
 
+    }
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.export_csv_btn).setVisible(false);
+        super.onPrepareOptionsMenu(menu);
     }
     public void takingPhoto(){
 //        button.setOnClickListener(new View.OnClickListener() {

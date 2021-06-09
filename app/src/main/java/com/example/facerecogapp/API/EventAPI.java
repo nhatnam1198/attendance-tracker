@@ -7,8 +7,10 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import okhttp3.MultipartBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
@@ -26,4 +28,7 @@ public interface EventAPI {
 
     @GET("event/")
     Call<ArrayList<Event>> getEventListBySubjectClassId(@Query("subjectClassId") Integer subjetClassId);
+
+    @DELETE("event/")
+    Call<ResponseBody> deleteEvent(@Query("eventId") Integer eventId);
 }

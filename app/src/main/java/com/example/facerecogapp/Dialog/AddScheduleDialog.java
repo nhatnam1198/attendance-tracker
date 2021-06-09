@@ -64,6 +64,8 @@ public class AddScheduleDialog extends DialogFragment{
     ArrayList<SubjectClass> subjectClassArrayList = new ArrayList<>();
     private Integer shiftId;
     private Integer subjetClassId;
+    private SubjectClass chosenSubjectClass;
+
     public interface AddScheduleDialogListener{
         public void onDialogPositiveClick(DialogFragment dialog);
         public void onDialogNegativeClick(DialogFragment dialog);
@@ -137,6 +139,7 @@ public class AddScheduleDialog extends DialogFragment{
                             @Override
                             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                                 subjetClassId = subjectClassArrayList.get(position).getId();
+                                chosenSubjectClass = subjectClassArrayList.get(position);
                             }
                         });
                     }
@@ -186,6 +189,12 @@ public class AddScheduleDialog extends DialogFragment{
             @Override
             public void onClick(View v) {
                 //listener.onDialogPositiveClick(AddScheduleDialog.this);
+
+
+                if(!isDateValid(editText.getText().toString())){
+                    Toast.makeText(getContext(), "Ngày bạn chọn không hợp lệ xin mời chọn ngày nằm trong thời gian học đã lên trước của lớp học phần", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 if(shiftId != 0 && subjetClassId != 0){
                     Event event = new Event();
                     event.setShiftId(shiftId);
@@ -196,7 +205,11 @@ public class AddScheduleDialog extends DialogFragment{
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat(datePattern);
                     try {
                         Date date = simpleDateFormat.parse(editText.getText().toString());
-                        event.setDateTime(date);
+                        String[] dateString = editText.getText().toString().split("/");
+                        String year = dateString[0];
+                        String month = dateString[1];
+                        String day = dateString[2];
+                        event.setDateTime(month+"/"+day+"/"+year);
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
@@ -232,7 +245,6 @@ public class AddScheduleDialog extends DialogFragment{
                     Toast.makeText(getContext(), "Hãy chọn các lựa chọn trên.", Toast.LENGTH_SHORT);
                     return;
                 }
-
             }
         });
         cancelButton = view.findViewById(R.id.dialog_cancel_btn);
@@ -272,7 +284,18 @@ public class AddScheduleDialog extends DialogFragment{
             e.printStackTrace();
         }
     }
-
+    private boolean isDateValid(String date){
+        try {
+            Date eventDate = new SimpleDateFormat("yyyy/MM/dd").parse(date);
+            if(eventDate.before(chosenSubjectClass.getStartDateTime()) || eventDate.after(chosenSubjectClass.getEndDateTime())){
+                return false;
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
     private void updateLabel() {
         String myFormat = "yyyy/MM/dd";
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);

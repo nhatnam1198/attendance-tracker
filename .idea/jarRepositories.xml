@@ -36,5 +36,15 @@
       <option name="name" value="maven" />
       <option name="url" value="https://jitpack.io" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="vsts-maven-adal-android" />
+      <option name="name" value="vsts-maven-adal-android" />
+      <option name="url" value="https://identitydivision.pkgs.visualstudio.com/_packaging/AndroidADAL/maven/v1" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven3" />
+      <option name="name" value="maven3" />
+      <option name="url" value="https://pkgs.dev.azure.com/MicrosoftDeviceSDK/DuoSDK-Public/_packaging/Duo-SDK-Feed/maven/v1" />
+    </remote-repository>
   </component>
 </project>

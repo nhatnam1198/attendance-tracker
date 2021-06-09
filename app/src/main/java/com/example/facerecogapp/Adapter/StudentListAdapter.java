@@ -2,6 +2,9 @@ package com.example.facerecogapp.Adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +23,8 @@ import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class StudentListAdapter extends RecyclerView.Adapter<StudentListAdapter.ViewHolder> {
     private List<Attendance> attendanceList;
@@ -43,14 +48,17 @@ public class StudentListAdapter extends RecyclerView.Adapter<StudentListAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull StudentListAdapter.ViewHolder holder, int position) {
-
         TextView studentNameTextView = holder.item_student_name;
         studentNameTextView.setText(attendanceList.get(position).getStudent().getName());
         TextView studentCodeTextView = holder.item_student_code;
         studentCodeTextView.setText(attendanceList.get(position).getStudent().getStudentCode());
         TextView studentEmailTextView = holder.item_student_email;
         studentEmailTextView.setText(attendanceList.get(position).getStudent().getEmail());
-
+        if(attendanceList.get(position).getStudent().getProfileImage() != null){
+            byte[] bytes = Base64.decode(attendanceList.get(position).getStudent().getProfileImage(), Base64.DEFAULT);
+            Bitmap profileImageBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+            holder.circle_profile_image_view.setImageBitmap(profileImageBitmap);
+        }
 //        holder.itemView.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
@@ -78,13 +86,14 @@ public class StudentListAdapter extends RecyclerView.Adapter<StudentListAdapter.
         public TextView item_student_name;
         public TextView item_student_code;
         public TextView item_student_email;
-
+        public CircleImageView circle_profile_image_view;
         // We also create a constructor that accepts the entire item row
         // and does the view lookups to find each subview
         public ViewHolder(View itemView) {
             // Stores the itemView in a public final member variable that can be used
             // to access the context from any ViewHolder instance.
             super(itemView);
+            circle_profile_image_view = itemView.findViewById(R.id.profile_image);
             item_student_name = (TextView) itemView.findViewById(R.id.item_student_name);
             item_student_code = (TextView) itemView.findViewById(R.id.item_student_code);
             item_student_email = (TextView) itemView.findViewById(R.id.item_student_email);

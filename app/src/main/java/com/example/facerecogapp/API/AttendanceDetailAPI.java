@@ -8,6 +8,7 @@ import com.example.facerecogapp.Model.Student;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -30,4 +31,7 @@ public interface AttendanceDetailAPI {
     @PUT("attendanceDetail/absence")
     @Headers("Content-Type: application/json")
     Call<Void> approveLeaveOfAbsenceRequest(@Body Integer attendanceId);
+
+    @PUT("attendanceDetail")
+    Call<ResponseBody> updateAttendanceDetail(@Body  ArrayList<AttendanceDetail> updateAttendanceDetail);
 }

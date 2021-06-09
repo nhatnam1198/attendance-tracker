@@ -2,21 +2,52 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.facerecogapp">
 
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <uses-feature android:name="android.hardware.type.watch" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission
+        android:name="android.permission.CAMERA"
+        android:required="true" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FaceRecogApp"
         android:usesCleartextTraffic="true">
-        <activity android:name=".Activity.StatisticsActivity"></activity>
+<!--        <uses-library-->
+<!--            android:name="com.google.android.wearable"-->
+<!--            android:required="true" />-->
+
+
+<!--        <meta-data-->
+<!--            android:name="com.google.android.wearable.standalone"-->
+<!--            android:value="true" />-->
+
+        <activity
+            android:name=".Activity.LoginActivity"
+            android:label="@string/title_activity_login">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".Activity.StatisticsActivity" />
         <activity
             android:name=".Activity.AbsenceRequestApprovalActivity"
             android:label="@string/title_activity_absence_request_approval"
-            android:theme="@style/Theme.FaceRecogApp.NoActionBar">
-            >
-        </activity>
+            android:theme="@style/Theme.FaceRecogApp.NoActionBar"></activity>
         <activity
             android:name=".Activity.LeaveOfAbsenceActivity"
             android:label="@string/title_activity_leave_of_absent"
@@ -53,20 +84,20 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+            </intent-filter>
+        </activity>
+        <activity android:name="com.microsoft.identity.client.BrowserTabActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="msauth"
+                    android:host="com.example.facerecogapp"
+                    android:path="/M61nf+aC69kCXmFY1ejcX83rDNc="
+                    />
             </intent-filter>
         </activity>
     </application>
-
-    <uses-feature
-        android:name="android.hardware.camera"
-        android:required="true" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission
-        android:name="android.permission.CAMERA"
-        android:required="true" />
-
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
 </manifest>

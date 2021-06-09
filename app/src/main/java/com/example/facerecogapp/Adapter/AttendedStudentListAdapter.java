@@ -1,6 +1,9 @@
 package com.example.facerecogapp.Adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +17,8 @@ import com.example.facerecogapp.R;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class AttendedStudentListAdapter extends RecyclerView.Adapter<AttendedStudentListAdapter.ViewHolder> {
     private List<Student> attendedStudentList;
@@ -42,6 +47,11 @@ public class AttendedStudentListAdapter extends RecyclerView.Adapter<AttendedStu
         studentCodeTextView.setText(attendedStudentList.get(position).getStudentCode());
         TextView studentEmailTextView = holder.item_student_email;
         studentEmailTextView.setText(attendedStudentList.get(position).getEmail());
+        if(attendedStudentList.get(position).getProfileImage() != null){
+            byte[] bytes = Base64.decode(attendedStudentList.get(position).getProfileImage(), Base64.DEFAULT);
+            Bitmap profileImageBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+            holder.circle_profile_image_view.setImageBitmap(profileImageBitmap);
+        }
     }
 
 @Override
@@ -54,7 +64,7 @@ public int getItemCount() {
         public TextView item_student_name;
         public TextView item_student_code;
         public TextView item_student_email;
-
+        public CircleImageView circle_profile_image_view;
         // We also create a constructor that accepts the entire item row
         // and does the view lookups to find each subview
         public ViewHolder(View itemView) {
@@ -64,7 +74,7 @@ public int getItemCount() {
             item_student_name = (TextView) itemView.findViewById(R.id.item_student_name);
             item_student_code = (TextView) itemView.findViewById(R.id.item_student_code);
             item_student_email = (TextView) itemView.findViewById(R.id.item_student_email);
-
+            circle_profile_image_view = itemView.findViewById(R.id.profile_image);
         }
     }
 }

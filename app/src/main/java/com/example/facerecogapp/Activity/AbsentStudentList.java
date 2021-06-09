@@ -1,5 +1,6 @@
 package com.example.facerecogapp.Activity;
 
+import android.content.ClipData;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -27,6 +28,7 @@ import com.example.facerecogapp.R;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -41,6 +43,7 @@ public class AbsentStudentList extends AppCompatActivity {
     private RecyclerView recyclerView;
     private SparseBooleanArray checkboxSparseBooleanArray;
     private AbsentStudentListAdapter absentStudentListAdapter;
+    private List<Integer> currentSelectedItems = new ArrayList<>();
     private Event event;
     private ArrayList<Student> approvedStudent;
 
@@ -49,6 +52,7 @@ public class AbsentStudentList extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_absent_student_list);
         Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitle("Danh sách học sinh vắng mặt");
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null){
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -130,6 +134,7 @@ public class AbsentStudentList extends AppCompatActivity {
                         attendedStudentList.add(absentStudentList.get(i));
                     }
                 }
+
                 try{
                     HashMap<String, Object> map = new HashMap<>();
                     map.put("attendedStudentList", attendedStudentList);
@@ -143,7 +148,7 @@ public class AbsentStudentList extends AppCompatActivity {
                                 Intent intent = new Intent(AbsentStudentList.this, SuccessActivity.class);
                                 startActivity(intent);
                             } else if(response.code() == 409){
-                                Toast.makeText(getApplicationContext(), "Buổi học đã được điểm danh", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), "Buổi học đã được điểm danh trước đó!", Toast.LENGTH_SHORT).show();
                             }else if (response.code() == 400){
                                 Toast.makeText(getApplicationContext(), "Lỗi kết nối tới server 400", Toast.LENGTH_SHORT).show();
                             }else {

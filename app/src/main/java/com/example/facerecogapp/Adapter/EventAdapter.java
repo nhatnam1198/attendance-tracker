@@ -1,24 +1,40 @@
 package com.example.facerecogapp.Adapter;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.facerecogapp.API.AttendanceDetailAPI;
+import com.example.facerecogapp.API.EventAPI;
+import com.example.facerecogapp.Activity.AbsentStudentList;
 import com.example.facerecogapp.Activity.AttendanceActivity;
 import com.example.facerecogapp.Activity.AttendedResultActivity;
+import com.example.facerecogapp.Activity.MainActivity;
+import com.example.facerecogapp.Activity.SuccessActivity;
 import com.example.facerecogapp.Model.Event;
 import com.example.facerecogapp.R;
+import com.example.facerecogapp.Service.ServiceGenerator;
 
 import java.io.Serializable;
 import java.util.List;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> {
     public TextView nameTextView;
@@ -55,6 +71,62 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         if(event.getStatus() != EVENT_CHECKED){
             holder.constraintLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.layout_bg_unchecked));
         }
+        holder.buttonViewOption.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PopupMenu popup = new PopupMenu(context, holder.buttonViewOption);
+
+                popup.inflate(R.menu.event_item_options);
+                //adding click listener
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.delete:
+                                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                                builder.setTitle("Xóa sự kiện!")
+                                        .setMessage("Bạn có chắc muốn xóa sự kiện này?")
+                                        .setPositiveButton(R.string.Ok, new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                EventAPI eventAPI = ServiceGenerator.createService(EventAPI.class);
+                                                Call<ResponseBody> call = eventAPI.deleteEvent(event.getId());
+                                                call.enqueue(new Callback<ResponseBody>() {
+                                                    @Override
+                                                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                                        if(response.code() != 200) {
+                                                            Toast.makeText(context, "Lỗi kết nối đến server", Toast.LENGTH_SHORT).show();
+                                                        }else {
+                                                            Toast.makeText(context, "Xóa buổi học thành công", Toast.LENGTH_SHORT).show();
+                                                            Intent intent = new Intent(context, MainActivity.class);
+                                                            notifyItemRemoved(position);
+                                                        }
+                                                    }
+
+                                                    @Override
+                                                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                                                    }
+                                                });
+                                            }
+                                        })
+                                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                dialog.dismiss();
+                                            }
+                                        })
+                                        .show();
+                                break;
+                            case R.id.edit:
+                                //handle menu2 click
+                                break;
+                        }
+                        return false;
+                    }
+                });
+                //displaying the popup
+                popup.show();
+            }
+        });
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -80,6 +152,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         return eventList.size();
     }
     public class ViewHolder extends RecyclerView.ViewHolder {
+        public TextView buttonViewOption;
         // Your holder should contain a member variable
         // for any view that will be set as you render a row
         public TextView shiftTextView;
@@ -98,6 +171,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
             subjectTextView = (TextView) itemView.findViewById(R.id.item_subject);
             classTextView = (TextView) itemView.findViewById(R.id.item_class);
             constraintLayout = (ConstraintLayout) itemView.findViewById(R.id.constraintLayout);
+            buttonViewOption = (TextView) itemView.findViewById(R.id.textViewOptions);
         }
     }
 }

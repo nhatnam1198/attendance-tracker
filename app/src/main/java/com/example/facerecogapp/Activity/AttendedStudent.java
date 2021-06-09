@@ -43,6 +43,7 @@ public class AttendedStudent extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_attended_student);
         Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitle("Danh sách học sinh đi học");
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null){
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);

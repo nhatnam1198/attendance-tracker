@@ -1,6 +1,10 @@
 package com.example.facerecogapp.Adapter;
 
+import android.content.ClipData;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +21,8 @@ import com.example.facerecogapp.R;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class AbsentStudentListAdapter extends RecyclerView.Adapter<AbsentStudentListAdapter.ViewHolder> {
     private List<Student> absentStudentList;
@@ -40,12 +46,18 @@ public class AbsentStudentListAdapter extends RecyclerView.Adapter<AbsentStudent
 
     @Override
     public void onBindViewHolder(@NonNull AbsentStudentListAdapter.ViewHolder holder, int position) {
+        Student absentStudent = absentStudentList.get(position);
         TextView studentNameTextView = holder.item_student_name;
-        studentNameTextView.setText(absentStudentList.get(position).getName());
+        studentNameTextView.setText(absentStudent.getName());
         TextView studentCodeTextView = holder.item_student_code;
-        studentCodeTextView.setText(absentStudentList.get(position).getStudentCode());
+        studentCodeTextView.setText(absentStudent.getStudentCode());
         TextView studentEmailTextView = holder.item_student_email;
-        studentEmailTextView.setText(absentStudentList.get(position).getEmail());
+        studentEmailTextView.setText(absentStudent.getEmail());
+        if(absentStudent.getProfileImage() != null){
+            byte[] bytes = Base64.decode(absentStudent.getProfileImage(), Base64.DEFAULT);
+            Bitmap profileImageBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+            holder.circle_profile_image_view.setImageBitmap(profileImageBitmap);
+        }
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -75,7 +87,7 @@ public class AbsentStudentListAdapter extends RecyclerView.Adapter<AbsentStudent
         public TextView item_student_code;
         public TextView item_student_email;
         public CheckBox checkBox;
-
+        public CircleImageView circle_profile_image_view;
         // We also create a constructor that accepts the entire item row
         // and does the view lookups to find each subview
         public ViewHolder(View itemView) {
@@ -86,7 +98,7 @@ public class AbsentStudentListAdapter extends RecyclerView.Adapter<AbsentStudent
             item_student_code = (TextView) itemView.findViewById(R.id.item_student_code);
             item_student_email = (TextView) itemView.findViewById(R.id.item_student_email);
             checkBox = (CheckBox) itemView.findViewById(R.id.checkbox);
-
+            circle_profile_image_view = itemView.findViewById(R.id.profile_image);
         }
     }
 

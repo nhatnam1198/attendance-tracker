@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 
 import android.text.SpannableString;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
@@ -52,10 +53,13 @@ import org.w3c.dom.Text;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.SimpleFormatter;
 
 public class StatisticsChartFragment extends Fragment implements SeekBar.OnSeekBarChangeListener, OnChartValueSelectedListener {
 
@@ -81,10 +85,15 @@ public class StatisticsChartFragment extends Fragment implements SeekBar.OnSeekB
         overall_attendance_rate_textView= (TextView) root.findViewById(R.id.overall_attendance_rate_textView);
 
         pieChart = root.findViewById(R.id.pie_chart);
+        setHasOptionsMenu(true);
         stackedBarChart = root.findViewById(R.id.bar_chart);
         return root;
     }
-
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.calendar_btn).setVisible(false);
+        super.onPrepareOptionsMenu(menu);
+    }
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -271,18 +280,18 @@ public class StatisticsChartFragment extends Fragment implements SeekBar.OnSeekB
         colors.add(ColorTemplate.getHoloBlue());
 
         dataSet.setColors(colors);
-        //dataSet.setSelectionShift(0f);
+        dataSet.setSelectionShift(0f);
 
-//        PieData data = new PieData(dataSet);
-//        data.setValueFormatter(new PercentFormatter());
-//        data.setValueTextSize(11f);
-//        data.setValueTextColor(Color.BLACK);
-//        data.setValueTypeface(Typeface.MONOSPACE);
-//        pieChart.setData(data);
-//
+        PieData data = new PieData(dataSet);
+        data.setValueFormatter(new PercentFormatter());
+        data.setValueTextSize(11f);
+        data.setValueTextColor(Color.BLACK);
+        data.setValueTypeface(Typeface.MONOSPACE);
+        pieChart.setData(data);
+
 //        // undo all highlights
-//        pieChart.highlightValues(null);
-//        pieChart.invalidate();
+        pieChart.highlightValues(null);
+        pieChart.invalidate();
     }
 
     private int[] getNumberOfAttendedStudent() {
@@ -373,7 +382,14 @@ public class StatisticsChartFragment extends Fragment implements SeekBar.OnSeekB
             int absentCount = 0;
             int leaveOfAbsenceRquestsCount = 0;
             Event event = eventList.get(i);
-            Date eventDate = eventList.get(i).getDateTime();
+            String eventDateString = eventList.get(i).getDateTime();
+            Date eventDate = null;
+            try {
+                eventDate = (new SimpleDateFormat("yyyy-MM-dd").parse(eventDateString));
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
             for(int j = 0; j< event.getAttendanceDetailsList().size();j++) {
                 int attendanceDetailStatus = event.getAttendanceDetailsList().get(j).getStatus();
                 if (attendanceDetailStatus == Const.ATTENDED){

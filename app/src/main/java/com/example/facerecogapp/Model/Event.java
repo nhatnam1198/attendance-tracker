@@ -12,7 +12,7 @@ public class Event implements Serializable {
     private Integer subjectClassId;
 
 
-    private Date dateTime;
+    private String dateTime;
     private int status;
     private List<AttendanceDetail> attendanceDetailsList = new ArrayList<>();
 
@@ -74,11 +74,11 @@ public class Event implements Serializable {
         this.subjectClassId = subjectClassId;
     }
 
-    public Date getDateTime() {
+    public String getDateTime() {
         return dateTime;
     }
 
-    public void setDateTime(Date dateTime) {
+    public void setDateTime(String dateTime) {
         this.dateTime = dateTime;
     }
 

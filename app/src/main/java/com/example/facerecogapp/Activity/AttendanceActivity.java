@@ -37,15 +37,19 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -70,6 +74,8 @@ public class AttendanceActivity extends AppCompatActivity {
     private Integer subjectClassId;
     private ArrayList<Attendance> attendanceArrayList;
     private Event event;
+    private TextView dateTextView;
+    private TextView subjectClassTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +83,7 @@ public class AttendanceActivity extends AppCompatActivity {
         setContentView(R.layout.activity_attendance);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.attendance_toolbar);
+        toolbar.setTitle("Danh sách học sinh");
         setSupportActionBar(toolbar);
 
         // add back arrow to toolbar
@@ -85,12 +92,17 @@ public class AttendanceActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
         checkButton = findViewById(R.id.button);
+        dateTextView = findViewById(R.id.date_text_view);
+        subjectClassTextView = findViewById(R.id.subject_class_text_view);
         Bundle extras = getIntent().getExtras();
         if(extras != null){
             event = (Event) extras.getSerializable("event");
+
             eventId = event.getId();
-//            eventId = extras.getInt("eventId");
             subjectClassId = extras.getInt("subjectClassId");
+            dateTextView.setText(event.getDateTime());
+            subjectClassTextView.setText(event.getSubjectClass().getName());
+
         }
         RecyclerView recyclerView = (RecyclerView)findViewById(R.id.attendance_recycle_view);
         fetchAttendanceList(new ResultCallBack<Attendance>() {
@@ -108,9 +120,7 @@ public class AttendanceActivity extends AppCompatActivity {
             }
         }, subjectClassId);
         handleEvent();
-//        RadioButton aiRadioBtn = (RadioButton) findViewById(R.id.radio_ai);
-//        RadioButton wifiRadioBtn = (RadioButton) findViewById(R.id.radio_wifi);
-//        RadioButton handcraftRadioBtn = (RadioButton) findViewById(R.id.radio_handcraft);
+
 
 
     }
@@ -201,10 +211,10 @@ public class AttendanceActivity extends AppCompatActivity {
                         ex.printStackTrace();
                     }
                 } else if (options[which].equals("Chọn ảnh")) {
-                    Intent intent = new Intent(
+                        Intent intent = new Intent(
                             Intent.ACTION_PICK,
                             android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    startActivityForResult(intent, ACTIVITY_SELECT_IMAGE);
+                        startActivityForResult(intent, ACTIVITY_SELECT_IMAGE);
                 } else if (options[which].equals("Cancel")) {
                     dialog.dismiss();
                 }
@@ -221,22 +231,42 @@ public class AttendanceActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
         if (resultCode == RESULT_OK) {
+            try {
+                this.tempFile = File.createTempFile("image", ".jpg");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             if (requestCode == TAKE_PICTURE) {
                 Bundle extras = intent.getExtras();
                 Bitmap imageBitmap = (Bitmap) extras.get("data");
                 byte[] byteArr = convertBitmapToByteArr(imageBitmap);
                 // Starts writing the bytes in it
                 try {
-                    this.tempFile = File.createTempFile("image", ".jpg");
                     FileOutputStream os = new FileOutputStream(tempFile);
                     os.write(byteArr);
                     os.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                sendImageToServer();
-            } else {
-
+                sendImageToServer(tempFile);
+            } else if(requestCode == ACTIVITY_SELECT_IMAGE) {
+                Uri imageUri = intent.getData();
+                try {
+                    InputStream inputStream = getContentResolver().openInputStream(imageUri);
+                    FileOutputStream out = new FileOutputStream(tempFile);
+                    byte[] buf = new byte[1024];
+                    int len;
+                    while((len=inputStream.read(buf))>0){
+                        out.write(buf,0,len);
+                    }
+                    out.close();
+                    inputStream.close();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                sendImageToServer(tempFile);
             }
         }
     }
@@ -260,13 +290,19 @@ public class AttendanceActivity extends AppCompatActivity {
             }
         });
     }
-    private void sendImageToServer() {
+    private void sendImageToServer(File imageFile) {
         Bundle extras = getIntent().getExtras();
         OkHttpClient okHttpClient = UnsafeOkHttpClient.getUnsafeOkHttpClient();
-        RequestBody requestBody = RequestBody.create(MediaType.parse("*/*"), this.tempFile);
-        MultipartBody.Part fbody =  MultipartBody.Part.createFormData("file", this.tempFile.getName(), requestBody);
+        RequestBody requestBody = RequestBody.create(MediaType.parse("*/*"), imageFile);
+        MultipartBody.Part fbody =  MultipartBody.Part.createFormData("file", imageFile.getName(), requestBody);
         IndentificationAPI indentificationAPI = ServiceGenerator.createService(IndentificationAPI.class);
         Call<ArrayList<Student>> call = indentificationAPI.indentifyPerson(fbody);
+        AlertDialog.Builder builder = new AlertDialog.Builder(AttendanceActivity.this);
+        builder.setView(R.layout.custom_progress_dialog);
+        Dialog dialog = builder.create();
+        builder.setCancelable(false);
+        dialog.show();
+
         call.enqueue(new Callback<ArrayList<Student>>() {
             @Override
             public void onResponse(Call<ArrayList<Student>> call, Response<ArrayList<Student>> response) {
@@ -278,12 +314,14 @@ public class AttendanceActivity extends AppCompatActivity {
                 }
                 if(attendedStudentList!= null)
                     intent.putExtra("attendedStudent", (Serializable) attendedStudentList);
+//                dialog.dismiss();
                 startActivity(intent);
             }
 
             @Override
             public void onFailure(Call<ArrayList<Student>> call, Throwable t) {
-
+                Toast.makeText(AttendanceActivity.this, "Failure", Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
             }
         });
     }

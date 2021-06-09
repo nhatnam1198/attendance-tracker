@@ -7,6 +7,15 @@ public class Student implements Serializable {
     private String name;
     private String email;
     private String studentCode;
+    private String profileImage;
+
+    public String getProfileImage() {
+        return profileImage;
+    }
+
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
+    }
 
     public String getStudentCode() {
         return studentCode;
