@@ -73,6 +73,7 @@
                 android:layout_height="wrap_content"
                 android:checked="false"
                 android:gravity="center"
+                android:clickable="false"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toEndOf="@+id/item_student_code"

@@ -49,4 +49,10 @@
     <string name="title_activity_absence_request_approval">AbsenceRequestApprovalActivity</string>
     <string name="menu_statistics">Thống kê</string>
     <string name="subject_class">Lớp học phần</string>
+    <string name="title_activity_login">login</string>
+    <!--
+    This string is used for square devices and overridden by hello_world in
+    values-round/strings.xml for round devices.
+    -->
+    <string name="hello_world">Hello Square World!</string>
 </resources>

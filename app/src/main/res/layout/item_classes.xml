@@ -106,4 +106,17 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/item_class"
         app:layout_constraintTop_toBottomOf="@+id/item_class" />
+
+    <TextView
+        android:id="@+id/textViewOptions"
+        android:layout_width="24dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="20dp"
+
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:text="&#8942;"
+        android:textAppearance="?android:textAppearanceLarge"
+        android:textColor="@color/white"
+        app:layout_constraintStart_toEndOf="@+id/item_event_name"
+        app:layout_constraintTop_toTopOf="@+id/item_event_name" />
 </androidx.constraintlayout.widget.ConstraintLayout>

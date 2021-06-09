@@ -1,0 +1,16 @@
+{
+  "client_id" : "85008c35-4b97-4c26-a164-b519f59140bd",
+  "authorization_user_agent" : "DEFAULT",
+  "redirect_uri" : "msauth://com.example.facerecogapp/M61nf%2BaC69kCXmFY1ejcX83rDNc%3D",
+  "broker_redirect_uri_registered" : false,
+  "account_mode" : "SINGLE",
+  "authorities" : [
+    {
+      "type": "AAD",
+      "audience": {
+        "type": "AzureADMyOrg",
+        "tenant_id": "b3b9cfc4-0719-45ae-9178-946ebe5ac23f"
+      }
+    }
+  ]
+}

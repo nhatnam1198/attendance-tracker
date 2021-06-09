@@ -8,10 +8,19 @@
         android:title="@string/action_settings"
         app:showAsAction="never" />
     <item
+        android:id="@+id/export_csv_btn"
+        android:title="calendar"
+        android:orderInCategory="100"
+        android:icon="@drawable/outline_file_download_24"
+        app:showAsAction="always"
+        ></item>
+
+    <item
         android:id="@+id/calendar_btn"
         android:title="calendar"
         android:orderInCategory="100"
-        android:icon="@drawable/ic_calendar_white"
+        android:icon="@drawable/outline_event_24"
         app:showAsAction="always"
         ></item>
+
 </menu>
