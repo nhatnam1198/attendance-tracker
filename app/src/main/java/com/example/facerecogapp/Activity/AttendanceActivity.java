@@ -290,6 +290,14 @@ public class AttendanceActivity extends AppCompatActivity {
             }
         });
     }
+    private Dialog getProgressBarDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(AttendanceActivity.this);
+        builder.setView(R.layout.custom_progress_dialog);
+        builder.setCancelable(false);
+        Dialog dialog = builder.create();
+        return dialog;
+    }
+
     private void sendImageToServer(File imageFile) {
         Bundle extras = getIntent().getExtras();
         OkHttpClient okHttpClient = UnsafeOkHttpClient.getUnsafeOkHttpClient();
@@ -297,10 +305,7 @@ public class AttendanceActivity extends AppCompatActivity {
         MultipartBody.Part fbody =  MultipartBody.Part.createFormData("file", imageFile.getName(), requestBody);
         IndentificationAPI indentificationAPI = ServiceGenerator.createService(IndentificationAPI.class);
         Call<ArrayList<Student>> call = indentificationAPI.indentifyPerson(fbody);
-        AlertDialog.Builder builder = new AlertDialog.Builder(AttendanceActivity.this);
-        builder.setView(R.layout.custom_progress_dialog);
-        Dialog dialog = builder.create();
-        builder.setCancelable(false);
+        Dialog dialog = getProgressBarDialog();
         dialog.show();
 
         call.enqueue(new Callback<ArrayList<Student>>() {
@@ -314,7 +319,6 @@ public class AttendanceActivity extends AppCompatActivity {
                 }
                 if(attendedStudentList!= null)
                     intent.putExtra("attendedStudent", (Serializable) attendedStudentList);
-//                dialog.dismiss();
                 startActivity(intent);
             }
 

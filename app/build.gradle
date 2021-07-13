@@ -38,7 +38,6 @@ android {
 
 dependencies {
     implementation 'com.microsoft.identity.client:msal:2.+'
-    implementation 'com.microsoft.graph:microsoft-graph:1.5.+'
     implementation "androidx.activity:activity-ktx:1.2.0-alpha04"
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
     implementation 'androidx.appcompat:appcompat:1.1.0'

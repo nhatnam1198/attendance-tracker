@@ -26,7 +26,7 @@
     <TextView
         android:id="@+id/item_label_2"
         android:layout_width="90dp"
-        android:layout_height="25dp"
+        android:layout_height="50dp"
         android:layout_marginTop="4dp"
         android:text="@string/className"
         android:textColor="@color/white"
@@ -39,7 +39,7 @@
     <TextView
         android:id="@+id/item_label_3"
         android:layout_width="92dp"
-        android:layout_height="25dp"
+        android:layout_height="50dp"
         android:layout_marginTop="4dp"
         android:text="@string/subject"
         android:textColor="@color/white"
@@ -62,7 +62,7 @@
     <TextView
         android:id="@+id/item_subject"
         android:layout_width="150dp"
-        android:layout_height="25dp"
+        android:layout_height="50dp"
 
         android:layout_marginTop="4dp"
         android:textColor="@color/white"
@@ -74,7 +74,7 @@
     <TextView
         android:id="@+id/item_class"
         android:layout_width="150dp"
-        android:layout_height="25dp"
+        android:layout_height="50dp"
 
         android:layout_marginTop="4dp"
         android:textColor="@color/white"
@@ -111,7 +111,7 @@
         android:id="@+id/textViewOptions"
         android:layout_width="24dp"
         android:layout_height="32dp"
-        android:layout_marginStart="20dp"
+        android:layout_marginStart="24dp"
 
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:text="&#8942;"

@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,8 +14,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.facerecogapp.API.AttendanceDetailAPI;
@@ -24,11 +28,16 @@ import com.example.facerecogapp.Activity.AttendanceActivity;
 import com.example.facerecogapp.Activity.AttendedResultActivity;
 import com.example.facerecogapp.Activity.MainActivity;
 import com.example.facerecogapp.Activity.SuccessActivity;
+import com.example.facerecogapp.Dialog.AddScheduleDialog;
+import com.example.facerecogapp.Dialog.EditScheduleDialog;
 import com.example.facerecogapp.Model.Event;
+import com.example.facerecogapp.Model.Shift;
+import com.example.facerecogapp.Model.Subject;
 import com.example.facerecogapp.R;
 import com.example.facerecogapp.Service.ServiceGenerator;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.ResponseBody;
@@ -36,15 +45,19 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> {
+public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder>{
+    private List<Shift> shiftList;
+    private List<Subject> subjectList;
     public TextView nameTextView;
     private final int EVENT_CHECKED = 1;
     private List<Event> eventList;
     Context context;
-    // Pass in the contact array into the constructor
-    public EventAdapter(List<Event> eventList, Context context) {
+
+    public EventAdapter(ArrayList<Event> eventArrayList, Context context, List<Shift> shiftList, List<Subject> subjectList) {
         this.context = context;
-        this.eventList = eventList;
+        this.eventList = eventArrayList;
+        this.shiftList = shiftList;
+        this.subjectList = subjectList;
     }
 
     @NonNull
@@ -88,6 +101,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
                                         .setMessage("Bạn có chắc muốn xóa sự kiện này?")
                                         .setPositiveButton(R.string.Ok, new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int id) {
+
                                                 EventAPI eventAPI = ServiceGenerator.createService(EventAPI.class);
                                                 Call<ResponseBody> call = eventAPI.deleteEvent(event.getId());
                                                 call.enqueue(new Callback<ResponseBody>() {
@@ -117,7 +131,16 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
                                         .show();
                                 break;
                             case R.id.edit:
-                                //handle menu2 click
+                                FragmentManager fragmentManager = ((AppCompatActivity) context).getSupportFragmentManager();
+                                EditScheduleDialog fragment = new EditScheduleDialog();
+                                Bundle bundle = new Bundle();
+                                if(shiftList != null){
+                                    bundle.putSerializable("shiftList", (ArrayList<Shift>) shiftList);
+                                    bundle.putSerializable("subjectList", (ArrayList<Subject>) subjectList);
+                                    bundle.putSerializable("event", event);
+                                    fragment.setArguments(bundle);
+                                    fragment.show(fragmentManager, "dialog");
+                                }
                                 break;
                         }
                         return false;

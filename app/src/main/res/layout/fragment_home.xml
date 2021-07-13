@@ -19,7 +19,6 @@
         app:srcCompat="@drawable/ic_menu_camera"
         app:tint="@color/white" />
     <!--Action name text for the add alarm button-->
-
     <TextView
         android:id="@+id/add_schedule_btn_text"
         android:layout_width="wrap_content"

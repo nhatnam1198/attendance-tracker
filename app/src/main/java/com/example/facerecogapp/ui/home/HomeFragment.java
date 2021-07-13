@@ -2,7 +2,9 @@ package com.example.facerecogapp.ui.home;
 
 import android.Manifest;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -35,6 +37,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.facerecogapp.API.EventAPI;
 import com.example.facerecogapp.API.ShiftAPI;
 import com.example.facerecogapp.API.SubjectAPI;
+import com.example.facerecogapp.Activity.LoginActivity;
 import com.example.facerecogapp.Activity.MainActivity;
 import com.example.facerecogapp.Adapter.EventAdapter;
 import com.example.facerecogapp.CallBack.ResultCallBack;
@@ -61,6 +64,7 @@ public class HomeFragment extends Fragment {
 
     private HomeViewModel homeViewModel;
     private static final  int REQUEST_IMAGE_CAPTURE = 101;
+
     private List<Shift> shiftList;
     private List<Subject> subjectList;
     private CalendarView calendarView;
@@ -69,12 +73,14 @@ public class HomeFragment extends Fragment {
     private TextView addScheduleBtnText;
     private FloatingActionButton fabButton;
     private boolean isFabsVisible = false;
+    SharedPreferences sharedPref;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         homeViewModel =
                 new ViewModelProvider(this).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
         setHasOptionsMenu(true);
+        sharedPref = getActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         recyclerViewClasses = (RecyclerView) root.findViewById(R.id.home_fragment_recycle_view);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerViewClasses.setLayoutManager(layoutManager);
@@ -160,7 +166,7 @@ public class HomeFragment extends Fragment {
                 getEventByDate(new ResultCallBack<Event>() {
                     @Override
                     public void onSuccess(ArrayList<Event> eventArrayList) {
-                        EventAdapter eventAdapter = new EventAdapter(eventArrayList, getContext());
+                        EventAdapter eventAdapter = new EventAdapter(eventArrayList, getContext(), shiftList, subjectList);
                         recyclerViewClasses.setAdapter(eventAdapter);
                         recyclerViewClasses.setLayoutManager(new LinearLayoutManager(getContext()));
                     }
@@ -211,6 +217,7 @@ public class HomeFragment extends Fragment {
 
     private void fetchShiftList(ShiftCallBack shiftCallBack){
         try{
+            String authorizedHeader = sharedPref.getString(getString(R.string.token), "0");
             ShiftAPI shiftAPI = ServiceGenerator.createService(ShiftAPI.class);
             Call<ArrayList<Shift>> call = shiftAPI.getShiftList();
             call.enqueue(new Callback<ArrayList<Shift>>() {
@@ -239,8 +246,11 @@ public class HomeFragment extends Fragment {
     }
     private void getEventByDate(ResultCallBack<Event> eventCallBack, String eventDate){
         ServiceGenerator serviceGenerator = new ServiceGenerator();
+        String authorizedHeader = getActivity().getPreferences(Context.MODE_PRIVATE).getString(getString(R.string.token), "0");
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        String userEmail = sharedPreferences.getString(getString(R.string.email), "0");
         EventAPI eventAPI = serviceGenerator.createService(EventAPI.class);
-        Call<ArrayList<Event>> call = eventAPI.getEventByDate(eventDate);
+        Call<ArrayList<Event>> call = eventAPI.getEventByDateAndUserName(eventDate, userEmail);
         call.enqueue(new Callback<ArrayList<Event>>() {
             @Override
             public void onResponse(Call<ArrayList<Event>> call, Response<ArrayList<Event>> response) {

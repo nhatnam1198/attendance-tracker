@@ -18,8 +18,8 @@
         tools:layout="@layout/statistics_fragment" />
 
     <fragment
-        android:id="@+id/nav_slideshow"
-        android:name="com.example.facerecogapp.ui.slideshow.SlideshowFragment"
-        android:label="@string/menu_slideshow"
-        tools:layout="@layout/fragment_slideshow" />
+        android:id="@+id/nav_manage_account"
+        android:name="com.example.facerecogapp.ui.account.AccountFragment"
+        android:label="@string/menu_account"
+        tools:layout="@layout/fragment_account" />
 </navigation>

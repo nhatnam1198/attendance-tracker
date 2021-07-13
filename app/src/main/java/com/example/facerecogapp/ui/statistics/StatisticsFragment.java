@@ -72,8 +72,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class StatisticsFragment extends Fragment {
-
-
     private StatisticsViewModel mViewModel;
     private PieChart pieChart;
     private BarChart barChart;

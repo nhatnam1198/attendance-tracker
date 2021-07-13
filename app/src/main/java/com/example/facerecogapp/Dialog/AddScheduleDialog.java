@@ -78,7 +78,7 @@ public class AddScheduleDialog extends DialogFragment{
         } catch (ClassCastException e) {
             // The activity doesn't implement the interface, throw exception
             throw new ClassCastException(AddScheduleDialog.this.toString()
-                    + " must implement NoticeDialogListener");
+                    + " must implement AddScheduleDialogListener");
         }
     }
     @Override

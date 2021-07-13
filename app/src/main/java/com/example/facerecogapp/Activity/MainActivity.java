@@ -1,9 +1,13 @@
 package com.example.facerecogapp.Activity;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -26,27 +30,38 @@ import com.example.facerecogapp.API.EventAPI;
 import com.example.facerecogapp.API.ShiftAPI;
 import com.example.facerecogapp.API.StatisticsAPI;
 import com.example.facerecogapp.API.SubjectAPI;
+import com.example.facerecogapp.API.TeacherAPI;
 import com.example.facerecogapp.Adapter.EventAdapter;
 import com.example.facerecogapp.CallBack.ResultCallBack;
 import com.example.facerecogapp.CallBack.ShiftCallBack;
 import com.example.facerecogapp.CallBack.SubjectCallBack;
 import com.example.facerecogapp.Const;
 import com.example.facerecogapp.Dialog.AddScheduleDialog;
+import com.example.facerecogapp.Dialog.EditScheduleDialog;
 import com.example.facerecogapp.Model.Event;
 import com.example.facerecogapp.Model.Shift;
 import com.example.facerecogapp.Model.Subject;
 import com.example.facerecogapp.Model.SubjectClass;
+import com.example.facerecogapp.Model.Teacher;
 import com.example.facerecogapp.R;
 import com.example.facerecogapp.Service.ServiceGenerator;
 import com.example.facerecogapp.ui.statistics.StatisticsFragment;
 import com.example.facerecogapp.ui.statisticsChart.StatisticsChartFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
+import com.microsoft.identity.client.IAccount;
+import com.microsoft.identity.client.IAuthenticationResult;
+import com.microsoft.identity.client.IPublicClientApplication;
+import com.microsoft.identity.client.ISingleAccountPublicClientApplication;
+import com.microsoft.identity.client.PublicClientApplication;
+import com.microsoft.identity.client.SilentAuthenticationCallback;
+import com.microsoft.identity.client.exception.MsalException;
 
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -89,11 +104,16 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MainActivity extends AppCompatActivity implements AddScheduleDialog.AddScheduleDialogListener {
+public class MainActivity extends AppCompatActivity implements AddScheduleDialog.AddScheduleDialogListener, EditScheduleDialog.EditScheduleDialogListener {
+    private final static String[] SCOPES = {"api://e2da588d-2e4b-4020-80f6-b97c0fe62adf/.default"};
+    SharedPreferences sharedPref;
+    final static String AUTHORITY = "https://login.microsoftonline.com/b3b9cfc4-0719-45ae-9178-946ebe5ac23f";
     private static final String CHANNEL_ID = "1";
     private AppBarConfiguration mAppBarConfiguration;
+    private ISingleAccountPublicClientApplication mSingleAccountApp;
     private ImageView imageView;
     private static final  int REQUEST_IMAGE_CAPTURE = 101;
+    private static final String TAG = MainActivity.class.getSimpleName();
     private Button button;
     private TextView textView;
     private FloatingActionButton fabButton;
@@ -102,6 +122,7 @@ public class MainActivity extends AppCompatActivity implements AddScheduleDialog
     private FloatingActionButton addScheduleBtn;
     private TextView addScheduleBtnText;
     final Calendar myCalendar = Calendar.getInstance();
+    private Teacher teacher;
     private boolean isFabsVisible = false;
     boolean isLargeLayout;
     private EditText editText;
@@ -109,6 +130,12 @@ public class MainActivity extends AppCompatActivity implements AddScheduleDialog
     private List<Subject> subjectList;
     AutoCompleteTextView autoCompleteTextView;
     private String fileName;
+    // key for storing email.
+    public static final String EMAIL_KEY = "email_key";
+    private String authorizationHeader;
+    private TextView nav_header_name;
+    private TextView nav_header_email;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,19 +145,23 @@ public class MainActivity extends AppCompatActivity implements AddScheduleDialog
         setSupportActionBar(toolbar);
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
+        View headerView = navigationView.getHeaderView(0);
+        nav_header_name = (TextView)headerView.findViewById(R.id.nav_header_name);
+        nav_header_email = (TextView)headerView.findViewById(R.id.nav_header_email);
+        sharedPref = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_statistic, R.id.nav_slideshow)
+                R.id.nav_home, R.id.nav_statistic, R.id.nav_manage_account, R.id.nav_logout)
                 .setDrawerLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+        navigationView.getMenu().findItem(R.id.nav_logout).setOnMenuItemClickListener(item -> {logoutAccount();
+                return true;});
+        initMsalInstance();
 
-//        RecyclerView recyclerViewClasses = (RecyclerView)findViewById(R.id.content_main_recycle_view);
-//
-//
         fetchShiftList(new ShiftCallBack() {
             @Override
             public void onSuccess(ArrayList<Shift> value) {
@@ -154,6 +185,7 @@ public class MainActivity extends AppCompatActivity implements AddScheduleDialog
 
             }
         });
+
 //
 //        calendarView = (CalendarView)findViewById(R.id.calendar_view);
 //        calendarView.setVisibility(View.INVISIBLE);
@@ -191,6 +223,75 @@ public class MainActivity extends AppCompatActivity implements AddScheduleDialog
 //            }
 //        });
 
+    }
+    private Dialog getProgressBarDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setView(R.layout.custom_progress_dialog);
+        builder.setCancelable(false);
+        Dialog dialog = builder.create();
+        return dialog;
+    }
+
+    private void getTeacherInfo(ResultCallBack callBack, String email) {
+        try{
+            TeacherAPI teacherAPI = ServiceGenerator.createService(TeacherAPI.class);
+            Call<Teacher> call = teacherAPI.getTeacher(email);
+            call.enqueue(new Callback<Teacher>() {
+                @Override
+                public void onResponse(Call<Teacher> call, Response<Teacher> response) {
+                    if(response.code() == 401){
+                        Toast.makeText(MainActivity.this, "Hết phiên đăng nhập", Toast.LENGTH_SHORT).show();
+                    }else{
+                        teacher = response.body();
+                        ArrayList<Teacher> teacherArrayList = new ArrayList<Teacher>();
+                        teacherArrayList.add(teacher);
+                        callBack.onSuccess(teacherArrayList);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Teacher> call, Throwable t) {
+
+                }
+            });
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private void initMsalInstance() {
+        PublicClientApplication.createSingleAccountPublicClientApplication(getApplicationContext(),
+                R.raw.auth_config_single_account, new IPublicClientApplication.ISingleAccountApplicationCreatedListener() {
+                    @Override
+                    public void onCreated(ISingleAccountPublicClientApplication application) {
+                        mSingleAccountApp = application;
+                        loadAccount();
+
+                    }
+                    @Override
+                    public void onError(MsalException exception) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(MainActivity.this, exception.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                });
+    }
+
+    private void logoutAccount() {
+        mSingleAccountApp.signOut(new ISingleAccountPublicClientApplication.SignOutCallback() {
+            @Override
+            public void onSignOut() {
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(intent);
+            }
+            @Override
+            public void onError(@NonNull MsalException exception){
+//                    displayError(exception);
+            }
+        });
     }
 
 
@@ -236,14 +337,78 @@ public class MainActivity extends AppCompatActivity implements AddScheduleDialog
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }
-//
+    private void loadAccount() {
+        if (mSingleAccountApp == null) {
+            return;
+        }
+        mSingleAccountApp.getCurrentAccountAsync(new ISingleAccountPublicClientApplication.CurrentAccountCallback() {
+            @Override
+            public void onAccountLoaded(@Nullable IAccount activeAccount) {
+                if(activeAccount != null){
+                    getTeacherInfo(new ResultCallBack<Teacher>() {
+                        @Override
+                        public void onSuccess(ArrayList<Teacher> teacherArrayList) {
+                            Teacher teacher = teacherArrayList.get(0);
+                            if(teacher != null){
+                                nav_header_name.setText(teacher.getName());
+                                nav_header_email.setText(teacher.getEmail());
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Throwable t) {
+
+                        }
+                    }, activeAccount.getUsername());
+                }
+            }
+
+            @Override
+            public void onAccountChanged(@Nullable IAccount priorAccount, @Nullable IAccount currentAccount) {
+                if (currentAccount == null) {
+                    // Perform a cleanup task as the signed-in account changed.
+//                    performOperationOnSignOut();
+                }
+            }
+
+            @Override
+            public void onError(@NonNull MsalException exception) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+//                        displayError(exception);
+                    }
+                });
+            }
+        });
+    }
+
+//    @Override
+//    public boolean onNavigationItemSelected(MenuItem item) {
+//        if(item.getItemId() == R.id.nav_logout){
+//            mSingleAccountApp.signOut(new ISingleAccountPublicClientApplication.SignOutCallback() {
+//                @Override
+//                public void onSignOut() {
+////                    updateUI(null);
+////                    performOperationOnSignOut();
+//                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+//                    startActivity(intent);
+//                }
+//                @Override
+//                public void onError(@NonNull MsalException exception){
+////                    displayError(exception);
+//                }
+//            });
+//        }
+//        return true;
+//    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
                 // User chose the "Settings" item, show the app settings UI...
                 return true;
-
             case R.id.calendar_btn:
 //                calendarView.setVisibility(View.VISIBLE);
                 return true;

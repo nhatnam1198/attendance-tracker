@@ -4,7 +4,6 @@
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
-    <uses-feature android:name="android.hardware.type.watch" />
     <uses-feature
         android:name="android.hardware.camera"
         android:required="true" />
@@ -36,10 +35,10 @@
 
         <activity
             android:name=".Activity.LoginActivity"
+            android:theme="@style/Theme.Design.NoActionBar"
             android:label="@string/title_activity_login">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -83,6 +82,8 @@
             android:windowSoftInputMode="adjustNothing">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
+<!--                    <category android:name="android.intent.category.LAUNCHER" />-->
 
 <!--                <category android:name="android.intent.category.LAUNCHER" />-->
             </intent-filter>
