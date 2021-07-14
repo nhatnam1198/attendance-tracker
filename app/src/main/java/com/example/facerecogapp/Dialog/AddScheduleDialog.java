@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
@@ -65,6 +66,7 @@ public class AddScheduleDialog extends DialogFragment{
     private Integer shiftId;
     private Integer subjetClassId;
     private SubjectClass chosenSubjectClass;
+    private String userEmail;
 
     public interface AddScheduleDialogListener{
         public void onDialogPositiveClick(DialogFragment dialog);
@@ -100,6 +102,9 @@ public class AddScheduleDialog extends DialogFragment{
         ArrayList<Shift> shiftList = (ArrayList<Shift>)bundle.getSerializable("shiftList");
         ArrayList<Subject> subjectList = (ArrayList<Subject>)bundle.getSerializable("subjectList");
 
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        userEmail = sharedPreferences.getString(getString(R.string.email), "0");
+
         AutoCompleteTextView subjectAutoCompleteTextView = view.findViewById(R.id.dialog_add_schedule_subject_autocomplete);
         AutoCompleteTextView shiftAutoCompleteTextView = view.findViewById(R.id.dialog_shift_autocomplete);
         AutoCompleteTextView subjectClassAutoCompleteTextView = view.findViewById(R.id.dialog_add_schedule_subject_class_autocomplete);
@@ -120,7 +125,7 @@ public class AddScheduleDialog extends DialogFragment{
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Integer subjectId = subjectList.get(position).getId();
-                getSubjectClassBySubjectClassIdAndTeacherId(new SubjectClassCallBack() {
+                getSubjectClassBySubjectIdAndTeacherEmail(new SubjectClassCallBack() {
                     @Override
                     public void onSuccess(ArrayList<SubjectClass> subjectClassArrayList) {
                         subjectClassAutoCompleteTextView.setText("Chọn lớp học phần", false);
@@ -148,7 +153,7 @@ public class AddScheduleDialog extends DialogFragment{
                     public void onFailure() {
                         Toast.makeText(getContext(), R.string.HTTP500, Toast.LENGTH_SHORT);
                     }
-                }, subjectId, 73);
+                }, subjectId, userEmail);
             }
         });
         ArrayAdapter shiftArrayAdapter = new ArrayAdapter(getContext(), R.layout.list_item, shiftName);
@@ -258,10 +263,10 @@ public class AddScheduleDialog extends DialogFragment{
         return builder.create();
     }
 
-    public void getSubjectClassBySubjectClassIdAndTeacherId(SubjectClassCallBack subjectCallBack, Integer subjectId, Integer teacherId){
+    public void getSubjectClassBySubjectIdAndTeacherEmail(SubjectClassCallBack subjectCallBack, Integer subjectId, String email){
         try{
             SubjectClassAPI subjectClassAPI = ServiceGenerator.createService(SubjectClassAPI.class);
-            Call<ArrayList<SubjectClass>> call = subjectClassAPI.getSubjectClassListBySubjectIdAndTeacherId(subjectId, teacherId);
+            Call<ArrayList<SubjectClass>> call = subjectClassAPI.getSubjectClassListBySubjectIdAndTeacherEmail(subjectId, email);
             call.enqueue(new Callback<ArrayList<SubjectClass>>() {
                 @Override
                 public void onResponse(Call<ArrayList<SubjectClass>> call, Response<ArrayList<SubjectClass>> response) {

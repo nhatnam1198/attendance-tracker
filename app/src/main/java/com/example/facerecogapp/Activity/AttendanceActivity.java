@@ -97,7 +97,6 @@ public class AttendanceActivity extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         if(extras != null){
             event = (Event) extras.getSerializable("event");
-
             eventId = event.getId();
             subjectClassId = extras.getInt("subjectClassId");
             dateTextView.setText(event.getDateTime());

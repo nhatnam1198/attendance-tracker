@@ -101,7 +101,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder>{
                                         .setMessage("Bạn có chắc muốn xóa sự kiện này?")
                                         .setPositiveButton(R.string.Ok, new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int id) {
-
                                                 EventAPI eventAPI = ServiceGenerator.createService(EventAPI.class);
                                                 Call<ResponseBody> call = eventAPI.deleteEvent(event.getId());
                                                 call.enqueue(new Callback<ResponseBody>() {
