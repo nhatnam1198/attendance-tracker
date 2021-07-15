@@ -30,7 +30,7 @@ public interface EventAPI {
     Call<ArrayList<Event>> getEventByDateAndUserName(@Path("date") String eventDate, @Query("userName")String userName);
 
     @GET("event/")
-    Call<ArrayList<Event>> getEventListBySubjectClassId(@Query("subjectClassId") Integer subjetClassId);
+    Call<ArrayList<Event>> getEventListBySubjectClassId(@Query("subjectClassId") Integer subjetClassId, @Query("email")String userEmail);
 
     @DELETE("event/")
     Call<ResponseBody> deleteEvent(@Query("eventId") Integer eventId);

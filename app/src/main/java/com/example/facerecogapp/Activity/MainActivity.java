@@ -135,6 +135,7 @@ public class MainActivity extends AppCompatActivity implements AddScheduleDialog
     private String authorizationHeader;
     private TextView nav_header_name;
     private TextView nav_header_email;
+    private String userEmail;
 
 
     @Override
@@ -161,7 +162,8 @@ public class MainActivity extends AppCompatActivity implements AddScheduleDialog
         navigationView.getMenu().findItem(R.id.nav_logout).setOnMenuItemClickListener(item -> {logoutAccount();
                 return true;});
         initMsalInstance();
-
+        SharedPreferences sharedPreferences = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        userEmail = sharedPreferences.getString(getString(R.string.email), "0");
         fetchShiftList(new ShiftCallBack() {
             @Override
             public void onSuccess(ArrayList<Shift> value) {
@@ -426,7 +428,7 @@ public class MainActivity extends AppCompatActivity implements AddScheduleDialog
                                 PackageManager.PERMISSION_GRANTED) {
                             SubjectClass subjectClass = eventArrayList.get(0).getSubjectClass();
                             StatisticsAPI statisticsAPI = ServiceGenerator.createService(StatisticsAPI.class);
-                            Call<ResponseBody> call = statisticsAPI.getStatisticsSheet(subjectClass.getId());
+                            Call<ResponseBody> call = statisticsAPI.getStatisticsSheet(subjectClass.getId(), userEmail);
                             call.enqueue(new Callback<ResponseBody>() {
                                 @Override
                                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {

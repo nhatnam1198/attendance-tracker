@@ -5,6 +5,8 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -79,6 +81,7 @@ public class StatisticsFragment extends Fragment {
     ArrayList<SubjectClass> subjectClasses = new ArrayList<>();
     ArrayList<Event> eventList = new ArrayList<>();
     private AutoCompleteTextView subjectClassAutoCompleteTextView;
+    private String userEmail;
 
     public static StatisticsFragment newInstance() {
         return new StatisticsFragment();
@@ -94,8 +97,10 @@ public class StatisticsFragment extends Fragment {
 //        barChart = root.findViewById(R.id.bar_chart);
 //        initBarChart();
 //        initPieChart();
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        userEmail = sharedPreferences.getString(getString(R.string.email), "0");
         subjectClassAutoCompleteTextView = root.findViewById(R.id._statistics_fragment_subject_class_autocomplete);
-        getSubjectClassByTeacherId(new SubjectClassCallBack() {
+        getSubjectClassByTeacherEmail(new SubjectClassCallBack() {
             @Override
             public void onSuccess(ArrayList<SubjectClass> value) {
                 subjectClasses = value;
@@ -118,6 +123,9 @@ public class StatisticsFragment extends Fragment {
                             @Override
                             public void onSuccess(ArrayList<Event> value) {
                                 eventList = value;
+                                if(eventList.size() == 0){
+                                    return;
+                                }
                                 StatisticsChartFragment statisticsChartFragment = (StatisticsChartFragment)getChildFragmentManager().findFragmentById(R.id.child_fragment_container);
                                 statisticsChartFragment.getEventList(eventList);
                                 StatisticsViewModel model =  new ViewModelProvider(getActivity()).get(StatisticsViewModel.class);
@@ -135,7 +143,7 @@ public class StatisticsFragment extends Fragment {
             public void onFailure() {
 
             }
-        }, 73);
+        }, userEmail);
         return root;
     }
 
@@ -157,7 +165,7 @@ public class StatisticsFragment extends Fragment {
     public void getEventListBySubjectClassId(ResultCallBack<Event> eventResultCallBack, Integer subjetClassId){
         try{
             EventAPI eventAPI = ServiceGenerator.createService(EventAPI.class);
-            Call<ArrayList<Event>> call = eventAPI.getEventListBySubjectClassId(subjetClassId);
+            Call<ArrayList<Event>> call = eventAPI.getEventListBySubjectClassId(subjetClassId, userEmail);
             call.enqueue(new Callback<ArrayList<Event>>() {
                 @Override
                 public void onResponse(Call<ArrayList<Event>> call, Response<ArrayList<Event>> response) {
@@ -180,10 +188,10 @@ public class StatisticsFragment extends Fragment {
             e.printStackTrace();
         }
     }
-    public void getSubjectClassByTeacherId(SubjectClassCallBack subjectCallBack, Integer teacherId){
+    public void getSubjectClassByTeacherEmail(SubjectClassCallBack subjectCallBack, String userEmail){
         try{
             SubjectClassAPI subjectClassAPI = ServiceGenerator.createService(SubjectClassAPI.class);
-            Call<ArrayList<SubjectClass>> call = subjectClassAPI.getSubjectClassByTeacherId(teacherId);
+            Call<ArrayList<SubjectClass>> call = subjectClassAPI.getSubjectClassByTeacherEmail(userEmail);
             call.enqueue(new Callback<ArrayList<SubjectClass>>() {
                 @Override
                 public void onResponse(Call<ArrayList<SubjectClass>> call, Response<ArrayList<SubjectClass>> response) {

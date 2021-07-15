@@ -12,5 +12,5 @@ import retrofit2.http.Query;
 
 public interface StatisticsAPI {
     @GET("statistics/reportFile")
-    Call<ResponseBody> getStatisticsSheet(@Query("subjectClassId") Integer subjectClassId);
+    Call<ResponseBody> getStatisticsSheet(@Query("subjectClassId") Integer subjectClassId, @Query("email") String email);
 }

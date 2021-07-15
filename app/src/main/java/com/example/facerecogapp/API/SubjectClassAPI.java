@@ -15,5 +15,5 @@ public interface SubjectClassAPI {
     Call<ArrayList<SubjectClass>> getSubjectClassListBySubjectIdAndTeacherEmail(@Query("subjectId") Integer subjectId, @Query("email") String email);
 
     @GET("subjectClass/teacher/list")
-    Call<ArrayList<SubjectClass>> getSubjectClassByTeacherId(@Query("teacherId") Integer teacherId);
+    Call<ArrayList<SubjectClass>> getSubjectClassByTeacherEmail(@Query("teacherEmail") String email);
 }
