@@ -3,13 +3,9 @@ package com.example.facerecogapp.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -17,30 +13,24 @@ import com.example.facerecogapp.API.AttendanceAPI;
 import com.example.facerecogapp.API.IndentificationAPI;
 import com.example.facerecogapp.Adapter.StudentListAdapter;
 import com.example.facerecogapp.CallBack.ResultCallBack;
-import com.example.facerecogapp.Const;
 import com.example.facerecogapp.Model.Attendance;
 import com.example.facerecogapp.Model.Event;
 import com.example.facerecogapp.Model.Student;
 import com.example.facerecogapp.Other.UnsafeOkHttpClient;
 import com.example.facerecogapp.R;
 import com.example.facerecogapp.Service.ServiceGenerator;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.os.Parcelable;
+import android.os.FileUtils;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
-import android.widget.RadioButton;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,8 +50,6 @@ import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class AttendanceActivity extends AppCompatActivity {
     File tempFile;
@@ -76,6 +64,11 @@ public class AttendanceActivity extends AppCompatActivity {
     private Event event;
     private TextView dateTextView;
     private TextView subjectClassTextView;
+    private static final CharSequence TAKE_PICTURE_STRING = "Chụp ảnh";
+    private static final CharSequence PICK_PICTURE_STRING = "Chọn ảnh";
+    private static final CharSequence TAKE_VIDEO_STRING = "Quay phim";
+    private static final CharSequence CANCEL = "Cancel";
+    private static final int VIDEO_CAPTURE = 40;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,24 +116,7 @@ public class AttendanceActivity extends AppCompatActivity {
 
 
     }
-    public void onRadioButtonClicked(View view) {
 
-        boolean checked = ((RadioButton) view).isChecked();
-        switch(view.getId()) {
-            case R.id.radio_ai:
-                if (checked)
-
-                    break;
-            case R.id.radio_wifi:
-                if (checked)
-
-                    break;
-            case R.id.radio_handcraft:
-                if (checked)
-
-                    break;
-        }
-    }
     private void fetchAttendanceList(ResultCallBack<Attendance> resultCallBack, Integer subjectClassId) {
         AttendanceAPI attendanceAPI = ServiceGenerator.createService(AttendanceAPI.class);
         Call<ArrayList<Attendance>> call = attendanceAPI.getAttendanceBySubjectClassId(subjectClassId);
@@ -190,8 +166,8 @@ public class AttendanceActivity extends AppCompatActivity {
     }
 
     public void captureImageCameraOrGallery() {
-        final CharSequence[] options = { "Chụp ảnh", "Chọn ảnh",
-                "Cancel" };
+        final CharSequence[] options = { TAKE_PICTURE_STRING, PICK_PICTURE_STRING, TAKE_VIDEO_STRING,
+                CANCEL };
         AlertDialog.Builder builder = new AlertDialog.Builder(
                 AttendanceActivity.this);
 
@@ -201,7 +177,7 @@ public class AttendanceActivity extends AppCompatActivity {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if (options[which].equals("Chụp ảnh")) {
+                if (options[which].equals(TAKE_PICTURE_STRING)) {
                     try {
                         Intent cameraIntent = new Intent(
                               MediaStore.ACTION_IMAGE_CAPTURE);
@@ -209,15 +185,18 @@ public class AttendanceActivity extends AppCompatActivity {
                     } catch (ActivityNotFoundException ex) {
                         ex.printStackTrace();
                     }
-                } else if (options[which].equals("Chọn ảnh")) {
+                } else if (options[which].equals(PICK_PICTURE_STRING)) {
                         Intent intent = new Intent(
                             Intent.ACTION_PICK,
                             android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                         startActivityForResult(intent, ACTIVITY_SELECT_IMAGE);
-                } else if (options[which].equals("Cancel")) {
+                }else if (options[which].equals(TAKE_VIDEO_STRING)){
+                    Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+                    startActivityForResult(intent, VIDEO_CAPTURE);
+                }
+                else if (options[which].equals(CANCEL)) {
                     dialog.dismiss();
                 }
-
             }
         });
         Dialog dialog = builder.create();
@@ -252,13 +231,13 @@ public class AttendanceActivity extends AppCompatActivity {
                 Uri imageUri = intent.getData();
                 try {
                     InputStream inputStream = getContentResolver().openInputStream(imageUri);
-                    FileOutputStream out = new FileOutputStream(tempFile);
+                    FileOutputStream os = new FileOutputStream(tempFile);
                     byte[] buf = new byte[1024];
                     int len;
                     while((len=inputStream.read(buf))>0){
-                        out.write(buf,0,len);
+                        os.write(buf,0,len);
                     }
-                    out.close();
+                    os.close();
                     inputStream.close();
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
@@ -266,26 +245,76 @@ public class AttendanceActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 sendImageToServer(tempFile);
+            }else if(requestCode == VIDEO_CAPTURE){
+                Uri videoUri = intent.getData();
+
+                sendCapturedVideoToServer(videoUri);
+
+//                try{
+//                    InputStream inputStream  = getContentResolver().openInputStream(videoUri);
+//                    int bytesRead;
+//                    ByteArrayOutputStream os = new ByteArrayOutputStream();
+//                    byte[] buf = new byte[1024];
+//                   while((bytesRead = inputStream.read(buf)) != -1){
+//                        os.write(buf, 0, bytesRead);
+//                   }
+//                   sendCapturedVideoToServer(os.toByteArray());
+//
+//                } catch (FileNotFoundException e) {
+//                    e.printStackTrace();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
             }
         }
     }
 
 
     private void sendCapturedVideoToServer(Uri fileUri){
-        File file = new File(fileUri.getPath());
-        RequestBody requestFile = RequestBody.create(MediaType.parse(getContentResolver().getType(fileUri)), file);
-        MultipartBody.Part body = MultipartBody.Part.createFormData("file", "captured_video", requestFile);
+        File videoFile = null;
+        try {
+            videoFile = File.createTempFile("video", ".mp4");
+            InputStream inputStream = getContentResolver().openInputStream(fileUri);
+            FileOutputStream os = new FileOutputStream(videoFile);
+            byte[] buf = new byte[1024];
+            int len;
+            while((len=inputStream.read(buf))>0){
+                os.write(buf,0,len);
+            }
+            os.close();
+            inputStream.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        RequestBody requestFile = RequestBody.create(MediaType.parse(getContentResolver().getType(fileUri)), videoFile);
+        MultipartBody.Part body = MultipartBody.Part.createFormData("file", videoFile.getName(), requestFile);
+
         IndentificationAPI indentificationAPI = ServiceGenerator.createService(IndentificationAPI.class);
-        Call<ArrayList<Student>> call = indentificationAPI.indentifyPerson(body);
+        Call<ArrayList<Student>> call = indentificationAPI.identifyPersonByCapturedVideo(body);
+        Dialog dialog = getProgressBarDialog();
+        dialog.show();
         call.enqueue(new Callback<ArrayList<Student>>() {
             @Override
             public void onResponse(Call<ArrayList<Student>> call, Response<ArrayList<Student>> response) {
-                Log.v("Uploaded", "success");
+                Intent intent = new Intent(AttendanceActivity.this, AttendedStudent.class);
+                ArrayList<Student> attendedStudentList = response.body();
+                if(attendanceArrayList != null){
+                    intent.putExtra("attendanceArrayList", (Serializable)attendanceArrayList);
+                    intent.putExtra("event", event);
+                }
+                if(attendedStudentList!= null)
+                    intent.putExtra("attendedStudent", (Serializable) attendedStudentList);
+                startActivity(intent);
+                dialog.dismiss();
             }
 
             @Override
             public void onFailure(Call<ArrayList<Student>> call, Throwable t) {
+                Toast.makeText(AttendanceActivity.this, t.toString(), Toast.LENGTH_SHORT).show();
                 Log.e("Upload error:", t.getMessage());
+                dialog.dismiss();
             }
         });
     }
@@ -303,7 +332,7 @@ public class AttendanceActivity extends AppCompatActivity {
         RequestBody requestBody = RequestBody.create(MediaType.parse("*/*"), imageFile);
         MultipartBody.Part fbody =  MultipartBody.Part.createFormData("file", imageFile.getName(), requestBody);
         IndentificationAPI indentificationAPI = ServiceGenerator.createService(IndentificationAPI.class);
-        Call<ArrayList<Student>> call = indentificationAPI.indentifyPerson(fbody);
+        Call<ArrayList<Student>> call = indentificationAPI.identifyPerson(fbody);
         Dialog dialog = getProgressBarDialog();
         dialog.show();
 

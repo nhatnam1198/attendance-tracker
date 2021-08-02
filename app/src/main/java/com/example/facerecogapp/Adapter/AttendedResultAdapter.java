@@ -61,12 +61,10 @@ public class AttendedResultAdapter extends RecyclerView.Adapter<AttendedResultAd
             Bitmap profileImageBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
             holder.circle_profile_image_view.setImageBitmap(profileImageBitmap);
         }
-            if(status == Const.ATTENDED || status == Const.ALLOWED){
-                holder.checkBox.setChecked(true);
-            }else {
-                holder.checkBox.setChecked(false);
-
-
+        if(status == Const.ATTENDED || status == Const.ALLOWED){
+            holder.checkBox.setChecked(true);
+        }else {
+            holder.checkBox.setChecked(false);
         }
     }
 

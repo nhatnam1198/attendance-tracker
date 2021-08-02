@@ -37,6 +37,8 @@ public class AttendedStudent extends AppCompatActivity {
     private TextView empty_text_view;
     private ArrayList<Attendance> attendanceList;
     private Event event;
+    private TextView num_students_text_view;
+    private TextView attended_rate_text_view;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +59,15 @@ public class AttendedStudent extends AppCompatActivity {
         getEvent();
         setRecycleViewAdapter();
         handleEvents();
+        setTextView();
+    }
+
+    private void setTextView() {
+        num_students_text_view = findViewById(R.id.num_students_text_view);
+        num_students_text_view.setText(attendedStudentList.size()+"/"+attendanceList.size());
+        attended_rate_text_view = findViewById(R.id.attended_rate_text_view);
+        attended_rate_text_view.setText((double)attendedStudentList.size()/attendanceList.size() + "%");
+
     }
 
     private void getAttendaceList() {
@@ -112,6 +123,7 @@ public class AttendedStudent extends AppCompatActivity {
         if (item.getItemId() == android.R.id.home) {
             finish();
         }
+        
         return super.onOptionsItemSelected(item);
     }
 }

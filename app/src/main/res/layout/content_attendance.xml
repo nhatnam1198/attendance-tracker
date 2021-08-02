@@ -73,35 +73,7 @@
 
         app:layout_constraintEnd_toStartOf="@+id/guideline5"
         app:layout_constraintStart_toStartOf="@+id/guideline3"
-        app:layout_constraintTop_toTopOf="@+id/guideline2">
-
-        <RadioButton
-            android:id="@+id/radio_ai"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-
-            android:onClick="onRadioButtonClicked"
-            android:text="AI" />
-
-        <RadioButton
-            android:id="@+id/radio_wifi"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:onClick="onRadioButtonClicked"
-            android:text="Wifi" />
-
-        <RadioButton
-            android:id="@+id/radio_handcraft"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:onClick="onRadioButtonClicked"
-
-            android:text="Thủ công" />
-
-    </RadioGroup>
+        app:layout_constraintTop_toTopOf="@+id/guideline2"/>
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline1"

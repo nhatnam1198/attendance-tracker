@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -26,7 +27,9 @@ public class ServiceGenerator {
                     .build();
             return chain.proceed(newRequest);
         }
-    }).build();
+    }).connectTimeout(500, TimeUnit.SECONDS)
+            .writeTimeout(500, TimeUnit.SECONDS)
+            .readTimeout(500, TimeUnit.SECONDS).build();
     private static final String BASE_URL = "http://192.168.1.137:8080/api/";
     private static  final Gson gson = new GsonBuilder()
                     .setLenient()
